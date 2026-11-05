@@ -10,7 +10,7 @@ const AdminAds = () => {
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     title: '',
@@ -20,6 +20,9 @@ const AdminAds = () => {
     image: '',
     bgColor: 'from-sky-900 to-navy-900'
   });
+
+  // Track which thumbnail images failed to load so we can show a fallback
+  const [brokenImages, setBrokenImages] = useState({});
 
   // Note: We remove `const db = getFirestore();` because we imported `db` above!
 
@@ -147,12 +150,19 @@ const AdminAds = () => {
           <div className="grid gap-4">
             {ads.map(ad => (
               <div key={ad.id} className={`bg-navy-900/80 backdrop-blur-xl border rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 transition ${ad.active ? 'border-sky-500/30' : 'border-rose-500/20 opacity-70'}`}>
-                
+
                 <div className="flex items-center gap-4 flex-1">
-                  {ad.image ? (
-                     <img src={ad.image} alt="" className="w-16 h-16 rounded-lg object-cover mix-blend-overlay bg-navy-950" />
+                  {ad.image && !brokenImages[ad.id] ? (
+                    <img
+                      src={ad.image}
+                      alt={ad.title || 'Ad thumbnail'}
+                      className="w-16 h-16 rounded-lg object-cover bg-navy-950 border border-sky-500/20"
+                      onError={() => setBrokenImages(prev => ({ ...prev, [ad.id]: true }))}
+                    />
                   ) : (
-                     <div className="w-16 h-16 rounded-lg bg-navy-950 border border-sky-500/20 flex items-center justify-center text-sky-500/30 text-xs">No Img</div>
+                    <div className="w-16 h-16 rounded-lg bg-navy-950 border border-sky-500/20 flex items-center justify-center text-sky-500/30 text-xs">
+                      No Img
+                    </div>
                   )}
                   <div>
                     <h3 className="font-bold text-white text-lg flex items-center gap-2">
