@@ -9,11 +9,12 @@ const AdSection = () => {
   const [internalAds, setInternalAds] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [imgError, setImgError] = useState(false);
   const location = useLocation();
   const adsenseRef = useRef(null);
 
-  const ADSENSE_CLIENT_ID = 'ca-pub-3493778872805373'; 
-  const ADSENSE_SLOT_ID = '7352622150'; 
+  const ADSENSE_CLIENT_ID = 'ca-pub-3493778872805373';
+  const ADSENSE_SLOT_ID = '7352622150';
 
   // Fetch Ads from Firestore
   useEffect(() => {
@@ -32,6 +33,11 @@ const AdSection = () => {
     };
     fetchAds();
   }, []);
+
+  // Reset image error state whenever the current ad changes
+  useEffect(() => {
+    setImgError(false);
+  }, [currentIndex]);
 
   // Load Google AdSense Script (Only once)
   useEffect(() => {
@@ -77,7 +83,7 @@ const AdSection = () => {
 
   const next = () => setCurrentIndex((prev) => (prev + 1) % internalAds.length);
   const prev = () => setCurrentIndex((prev) => (prev - 1 + internalAds.length) % internalAds.length);
-  
+
   const handleAdClick = async () => {
     if (!internalAds[currentIndex]) return;
     try {
@@ -88,6 +94,7 @@ const AdSection = () => {
   if (loading || internalAds.length === 0) return null;
 
   const currentAd = internalAds[currentIndex];
+  const showImage = currentAd.image && !imgError;
 
   return (
     <section id="ads" className="py-16 bg-navy-gradient relative overflow-hidden border-y border-sky-500/10">
@@ -97,7 +104,7 @@ const AdSection = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 items-center">
-          
+
           {/* LEFT SIDE: In-House Ad */}
           <div className="relative">
             <motion.div
@@ -108,37 +115,31 @@ const AdSection = () => {
               className={`rounded-2xl shadow-xl overflow-hidden border border-sky-500/20 bg-gradient-to-r ${currentAd.bgColor || 'from-sky-900 to-navy-900'}`}
             >
               <div className="md:flex items-center">
-                {/* IMAGE FIX: Added a robust image checker */}
-                <div className="md:w-1/2 h-48 md:h-full bg-navy-950 relative flex items-center justify-center overflow-hidden">
-                  {currentAd.image ? (
-                    <img 
-                      src={currentAd.image} 
-                      alt={currentAd.title} 
-                      className="w-full h-full object-cover opacity-80 mix-blend-overlay absolute inset-0"
-                      onError={(e) => {
-                        // If image fails to load, hide it and show fallback icon
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
+                {/* IMAGE AREA */}
+                <div className="md:w-1/2 h-48 md:h-full min-h-[192px] bg-navy-950 relative flex items-center justify-center overflow-hidden">
+                  {showImage ? (
+                    <img
+                      src={currentAd.image}
+                      alt={currentAd.title}
+                      className="w-full h-full object-cover absolute inset-0"
+                      onError={() => setImgError(true)}
                     />
-                  ) : null}
-                  
-                  {/* Fallback Icon (Shows if no image URL or if image fails to load) */}
-                  <div 
-                    className={`w-full h-full flex flex-col items-center justify-center opacity-30 ${currentAd.image ? 'hidden' : 'flex'}`}
-                  >
-                    <FaImage className="text-4xl text-sky-400 mb-2" />
-                    <span className="text-xs text-sky-200 uppercase tracking-widest">No Image</span>
-                  </div>
+                  ) : (
+                    /* Fallback Icon (Shows if no image URL or if image fails to load) */
+                    <div className="w-full h-full flex flex-col items-center justify-center opacity-30">
+                      <FaImage className="text-4xl text-sky-400 mb-2" />
+                      <span className="text-xs text-sky-200 uppercase tracking-widest">No Image</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-6 md:w-1/2 text-white relative z-10">
                   <h3 className="text-xl font-display font-bold mb-2">{currentAd.title}</h3>
                   <p className="text-sm text-white/70 mb-6">{currentAd.description}</p>
-                  <a 
-                    href={currentAd.link} 
+                  <a
+                    href={currentAd.link}
                     onClick={handleAdClick}
-                    target="_blank" 
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block px-4 py-2 bg-white text-navy-950 text-sm font-bold rounded-lg hover:bg-gray-100 transition"
                   >
@@ -164,9 +165,9 @@ const AdSection = () => {
           {/* RIGHT SIDE: Google AdSense */}
           <div className="bg-navy-900/50 border border-sky-500/20 rounded-2xl p-4 flex flex-col items-center justify-center min-h-[250px] relative overflow-hidden">
             <span className="absolute top-2 right-2 text-[10px] text-sky-100/30 uppercase tracking-widest">Ad</span>
-            
+
             {/* Added ref to control the ad element directly */}
-            <ins 
+            <ins
               ref={adsenseRef}
               className="adsbygoogle w-full"
               style={{ display: 'block', minHeight: '200px' }}
