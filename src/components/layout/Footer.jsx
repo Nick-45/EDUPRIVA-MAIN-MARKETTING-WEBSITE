@@ -149,6 +149,9 @@ const Footer = () => {
             <Link to="/terms" className="text-sky-100/40 hover:text-sky-300 text-sm transition">
               Terms of Service
             </Link>
+<Link to="/delete" className="hover:text-sky-300 transition">
+  Delete My Account
+</Link>
             <Link to="/cookies" className="text-sky-100/40 hover:text-sky-300 text-sm transition">
               Cookie Policy
             </Link>
