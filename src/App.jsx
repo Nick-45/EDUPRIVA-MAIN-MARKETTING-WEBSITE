@@ -51,7 +51,7 @@ function App() {
       <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
       <Route path="/app-download" element={<PrivateRoute><AppDownload /></PrivateRoute>} />
 
-<Route path="/delete-account" element={<DeleteAccount />} />
+<Route path="/delete" element={<DeleteAccount />} />
 
       <Route path="/admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
       <Route path="/admin/schools/:id" element={<AdminGuard><SchoolDetail /></AdminGuard>} />
