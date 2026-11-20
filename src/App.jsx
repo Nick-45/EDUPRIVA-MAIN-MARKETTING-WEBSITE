@@ -12,6 +12,8 @@ import Signup from './pages/Signup';
 import Settings from './pages/Settings';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import DeleteAccount from './pages/DeleteAccount';
+
 
 import AdminGuard from './pages/admin/AdminGuard';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -48,6 +50,8 @@ function App() {
       <Route path="/payment" element={<PrivateRoute><Payment /></PrivateRoute>} />
       <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
       <Route path="/app-download" element={<PrivateRoute><AppDownload /></PrivateRoute>} />
+
+<Route path="/delete-account" element={<DeleteAccount />} />
 
       <Route path="/admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
       <Route path="/admin/schools/:id" element={<AdminGuard><SchoolDetail /></AdminGuard>} />
